@@ -2,7 +2,7 @@
 IMAGE=nginx-proxy
 TAG=latest
 
-.PHONY: build test debug
+.PHONY: build tag push test debug
 
 all: build
 build:
@@ -13,3 +13,9 @@ debug:
 
 test:
 	docker run -p 80:80 ${IMAGE}:${TAG}
+
+tag:
+	docker tag ${IMAGE}:${TAG} kaija/nginx-proxy:${TAG}
+
+push:
+	docker push kaija/nginx-proxy:${TAG}

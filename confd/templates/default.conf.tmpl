@@ -2,14 +2,26 @@ server {
     # Listen port
     {{ range split (getenv "NGX_LISTENS") ";" }}
     listen       {{.}};
-    {{ end}}
+    {{ end }}
+
+    {{ if ( getenv "NGX_SSL_CERT" ) ne "" }}
+    # SSL certificate setting if needed
+    ssl_certificate        /etc/nginx/ssl/ssl_cert.pem;
+    ssl_certificate_key    /etc/nginx/ssl/ssl_pkey.pem;
+    {{ end }}
+
+    {{ if ( getenv "NGX_SSL_CA" ) ne "" }}
+    # SSL CA setting if client verification needed
+    ssl_client_certificate /etc/nginx/ssl/ssl_ca.pem;
+    ssl_verify_client      optional;
+    {{ end }}
 
     # Server name
     {{ range split (getenv "NGX_SERVERS") ";" }}
     server_name  {{.}};
     {{ end}}
 
-
+    # Proxy to backend
     location / {
         proxy_pass       http://{{getenv "NGX_PROXY_PASS"}};
         proxy_set_header Host            $host;
