@@ -1,0 +1,30 @@
+server {
+    # Listen port
+    {{ range split (getenv "NGX_LISTENS") ";" }}
+    listen       {{.}};
+    {{ end}}
+
+    # Server name
+    {{ range split (getenv "NGX_SERVERS") ";" }}
+    server_name  {{.}};
+    {{ end}}
+
+
+    location / {
+        proxy_pass       http://{{getenv "NGX_PROXY_PASS"}};
+        proxy_set_header Host            $host;
+        proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+        proxy_set_header X-Client-Verified $ssl_client_verify;
+        proxy_set_header X-Client-DN $ssl_client_s_dn_legacy;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+}
